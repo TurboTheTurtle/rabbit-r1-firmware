@@ -1,0 +1,19 @@
+# Firmware images (too large for git)
+firmware/*.img
+firmware/*.bin
+firmware/*.zip
+!firmware/README.md
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+.venv/
