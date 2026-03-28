@@ -106,6 +106,19 @@ check_fastboot() {
     info "Fastboot device detected"
 }
 
+check_bootloader_fastboot() {
+    check_fastboot
+
+    # Step 7+ must run in bootloader fastboot, not userspace fastbootd.
+    if fastboot getvar is-userspace 2>&1 | grep -q "yes"; then
+        error "Device is in fastbootd, but bootloader fastboot is required"
+        echo "  Run: fastboot reboot bootloader"
+        exit 1
+    fi
+
+    info "Bootloader fastboot mode confirmed"
+}
+
 wait_for_fastbootd() {
     info "Waiting for fastbootd..."
     local timeout=60
@@ -172,9 +185,8 @@ main() {
     info "This takes ~100 seconds for the 2GB sparse image..."
     run fastboot flash super "$STOCK_DIR/super.img"
 
-    step 5 "Flashing vbmeta in fastbootd"
-    run fastboot --disable-verity --disable-verification flash vbmeta_system_a "$STOCK_DIR/vbmeta_system.img"
-    run fastboot --disable-verity --disable-verification flash vbmeta_vendor_a "$STOCK_DIR/vbmeta_vendor.img"
+    step 5 "Skipping vbmeta flashes in fastbootd"
+    info "vbmeta_* partitions are physical and were already flashed in step 2"
 
     # Phase 2: Verify stock boot (optional)
     if ! $SKIP_STOCK_VERIFY; then
@@ -189,8 +201,14 @@ main() {
             warn "After verifying stock boots, power off the R1 and re-enter fastboot."
             warn "Run: ./fastboot-entry.sh"
             read -p "Press Enter when back in fastboot mode..."
-            check_fastboot
         fi
+    else
+        step 6 "Returning to bootloader fastboot (--skip-stock-verify)"
+        run fastboot reboot bootloader
+    fi
+
+    if ! $DRY_RUN; then
+        check_bootloader_fastboot
     fi
 
     # Phase 3: Flash CipherOS

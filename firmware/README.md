@@ -21,6 +21,10 @@ Firmware images are not included in this repository due to their size. Download 
 
 **Download:** [CipherOS for Rabbit R1](https://cipheros.com/) (device codename: `cipher_r1`)
 
+**Direct build directory:** [SourceForge CipherOS-7/r1](https://sourceforge.net/projects/cipheros/files/CipherOS-7/r1/)
+
+**Known newer build:** `CipherOS-7.0-ALHENA-cipher_r1-20250623-0753-BETA-OFFICIAL-VANILLA` (reported to include side-button fixes)
+
 **Required files:**
 | File | Size | Purpose |
 |------|------|---------|
@@ -34,6 +38,7 @@ Firmware images are not included in this repository due to their size. Download 
 See `checksums.sha256` for SHA256 checksums of known-good images.
 
 To verify:
+
 ```bash
 sha256sum -c checksums.sha256
 ```
