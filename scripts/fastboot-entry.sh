@@ -13,6 +13,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 R1_ESCAPE_DIR="${R1_ESCAPE_DIR:-/root/r1_escape}"
 MTKBOOTCMD="${R1_ESCAPE_DIR}/mtkbootcmd.py"
+MODPROBE_BIN=""
+LSMOD_BIN=""
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -23,12 +25,42 @@ info()  { echo -e "${GREEN}[*]${NC} $*"; }
 warn()  { echo -e "${YELLOW}[!]${NC} $*"; }
 error() { echo -e "${RED}[!]${NC} $*" >&2; }
 
+resolve_bin() {
+    local name="$1"
+    shift
+
+    if command -v "$name" &>/dev/null; then
+        command -v "$name"
+        return 0
+    fi
+
+    for candidate in "$@"; do
+        if [ -x "$candidate" ]; then
+            echo "$candidate"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 # Check prerequisites
 check_prereqs() {
     if [ ! -f "$MTKBOOTCMD" ]; then
         error "mtkbootcmd.py not found at: $MTKBOOTCMD"
-        echo "  Clone r1_escape: git clone https://github.com/RabbitHoleEscapeR1/r1_escape.git"
-        echo "  Or set R1_ESCAPE_DIR environment variable"
+        echo "  Set R1_ESCAPE_DIR to your r1_escape clone path, for example:"
+        echo "    export R1_ESCAPE_DIR=$HOME/r1_escape"
+        echo "  Clone if needed: git clone https://github.com/RabbitHoleEscapeR1/r1_escape.git"
+        exit 1
+    fi
+
+    if ! MODPROBE_BIN="$(resolve_bin modprobe /sbin/modprobe /usr/sbin/modprobe)"; then
+        error "modprobe not found"
+        exit 1
+    fi
+
+    if ! LSMOD_BIN="$(resolve_bin lsmod /sbin/lsmod /usr/sbin/lsmod)"; then
+        error "lsmod not found"
         exit 1
     fi
 
@@ -53,8 +85,8 @@ enable_serial() {
         mv /etc/modprobe.d/blacklist-cdc_acm.conf /etc/modprobe.d/blacklist-cdc_acm.conf.disabled
     fi
 
-    if ! lsmod | grep -q cdc_acm; then
-        modprobe cdc_acm
+    if ! "$LSMOD_BIN" | grep -q cdc_acm; then
+        "$MODPROBE_BIN" cdc_acm
     fi
 }
 

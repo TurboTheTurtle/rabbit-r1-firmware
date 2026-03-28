@@ -7,6 +7,7 @@ This guide walks through flashing [CipherOS](https://cipheros.com/) (Android 16)
 ## Prerequisites
 
 ### Hardware
+
 - Rabbit R1
 - USB-C data cable
 - Linux host with USB access (tested on Proxmox/Debian)
@@ -32,14 +33,21 @@ git clone https://github.com/RabbitHoleEscapeR1/r1_escape.git
 
 **Stock Firmware (required):**
 Download `rabbit_OS_v0.8.293.zip` from [rabbit-hmi-oss/firmware](https://github.com/rabbit-hmi-oss/firmware/releases/download/v0.8.293/rabbit_OS_v0.8.293.zip) and extract it. You need:
+
 - `boot.img` -- Stock kernel (required for fastbootd support)
 - `super.img` -- Stock super partition (clean partition base)
 - `vbmeta.img`, `vbmeta_system.img`, `vbmeta_vendor.img`
 
 **CipherOS (required):**
 Download CipherOS for the Rabbit R1 (`cipher_r1`). You need:
+
+- Recommended build: `CipherOS-7.0-ALHENA-cipher_r1-20250623-0753-BETA-OFFICIAL-VANILLA`
+- SourceForge directory: <https://sourceforge.net/projects/cipheros/files/CipherOS-7/r1/>
+
 - `system.img`, `system_ext.img`, `product.img`, `vendor.img`
 - `vbmeta.img`, `vbmeta_system.img`, `vbmeta_vendor.img`
+
+Compatibility note: some users report that unlock/entry attempts with `r1_escape` fail on the newest RabbitOS OTA builds, while older known-good backups from the `r1_escape` community have worked. Treat this as anecdotal until broader testing confirms exact versions.
 
 ### Kernel Module Setup
 
@@ -70,6 +78,7 @@ MediaTek Preloader (ROM) → LK Bootloader → Linux Kernel → Android Init
 The R1 has **no volume buttons**, so the standard Android method of holding Volume Down + Power to enter fastboot doesn't work. Instead, we use `mtkbootcmd.py` from the [r1_escape](https://github.com/RabbitHoleEscapeR1/r1_escape) project, which sends a `FASTBOOT` command via USB serial to the MediaTek preloader before it hands off to the bootloader.
 
 **Two-stage fastboot:**
+
 1. **Bootloader fastboot** (LK level) -- Can flash physical partitions like `boot_a`, `vbmeta_a`
 2. **Userspace fastbootd** -- Can flash logical partitions inside `super` (system, vendor, product, system_ext)
 
@@ -95,6 +104,7 @@ python3 r1_escape/mtkbootcmd.py FASTBOOT
 ```
 
 Verify fastboot mode:
+
 ```bash
 fastboot devices
 # Should show: <serial>    fastboot
@@ -129,6 +139,7 @@ fastboot reboot fastboot
 ```
 
 Wait for the device to reboot into userspace fastbootd. Verify:
+
 ```bash
 fastboot getvar is-userspace
 # Should show: is-userspace: yes
@@ -144,12 +155,11 @@ fastboot flash super /path/to/stock_firmware/super.img
 
 This takes ~100 seconds for the 2GB sparse image.
 
-### Step 6: Flash Vbmeta in Fastbootd
+### Step 6: Do Not Flash Vbmeta in Fastbootd
 
-```bash
-fastboot --disable-verity --disable-verification flash vbmeta_system_a /path/to/stock_firmware/vbmeta_system.img
-fastboot --disable-verity --disable-verification flash vbmeta_vendor_a /path/to/stock_firmware/vbmeta_vendor.img
-```
+Do not flash `vbmeta_system_a` or `vbmeta_vendor_a` in fastbootd.
+
+Those vbmeta partitions are physical partitions that were already flashed in Step 3 from bootloader fastboot. Re-flashing them in fastbootd is unnecessary and can fail.
 
 ### Step 7: Verify Stock Boot (Optional but Recommended)
 
@@ -163,7 +173,21 @@ The R1 should boot to the RabbitOS setup screen. If it does, you know the base i
 
 ### Step 8: Re-enter Fastboot Mode
 
-Repeat Step 1 to re-enter fastboot via `mtkbootcmd.py`.
+Use one of these paths:
+
+- If you performed Step 7 (stock boot verification), repeat Step 1 to re-enter fastboot via `mtkbootcmd.py`.
+- If you skipped Step 7 and are still in fastbootd, return to bootloader fastboot first:
+
+```bash
+fastboot reboot bootloader
+```
+
+Verify you are back in bootloader fastboot (not fastbootd):
+
+```bash
+fastboot getvar is-userspace
+# Should NOT show: is-userspace: yes
+```
 
 ### Step 9: Flash Boot and Vbmeta Again
 
@@ -254,14 +278,14 @@ Stock firmware v0.8.293 is available at [rabbit-hmi-oss/firmware](https://github
 
 ## Final Configuration
 
-| Setting | Value |
-|---------|-------|
-| ROM | CipherOS (cipher_r1-userdebug) |
-| Android Version | 16 |
-| Build | BP2A.250605.031.A2 |
-| Architecture | arm64-v8a |
-| SDK Level | 36 |
-| Display Density | 190 |
-| Active Slot | a |
-| Boot Image | Stock v0.8.293 (for fastbootd support) |
-| System/Vendor/Product | CipherOS |
+| Setting               | Value                                  |
+| --------------------- | -------------------------------------- |
+| ROM                   | CipherOS (cipher_r1-userdebug)         |
+| Android Version       | 16                                     |
+| Build                 | BP2A.250605.031.A2                     |
+| Architecture          | arm64-v8a                              |
+| SDK Level             | 36                                     |
+| Display Density       | 190                                    |
+| Active Slot           | a                                      |
+| Boot Image            | Stock v0.8.293 (for fastbootd support) |
+| System/Vendor/Product | CipherOS                               |

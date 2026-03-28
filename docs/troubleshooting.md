@@ -9,6 +9,7 @@
 **Cause:** The `cdc_acm` kernel module is loaded and grabbing the USB device before adb can.
 
 **Fix:**
+
 ```bash
 rmmod cdc_acm
 # Verify
@@ -16,6 +17,7 @@ adb devices
 ```
 
 To make this persist across reboots, ensure cdc_acm is blacklisted:
+
 ```bash
 echo "blacklist cdc_acm" > /etc/modprobe.d/blacklist-cdc_acm.conf
 ```
@@ -27,17 +29,32 @@ echo "blacklist cdc_acm" > /etc/modprobe.d/blacklist-cdc_acm.conf
 **Common causes:**
 
 1. **cdc_acm not loaded** -- mtkbootcmd.py needs the serial device, which requires cdc_acm:
-   ```bash
-   modprobe cdc_acm
-   ```
+
+    ```bash
+    modprobe cdc_acm
+    ```
 
 2. **Device is still powered on** -- The device must be completely powered off before plugging in. The preloader only runs during initial power-on.
-   - Use the reset pin (near SIM slot) with a SIM ejector tool
-   - Or hold the power button until the screen goes completely dark
+    - Use the reset pin (near SIM slot) with a SIM ejector tool
+    - Or hold the power button until the screen goes completely dark
 
 3. **Device was plugged in before running the script** -- The script must be running BEFORE you plug in the device. The preloader window is brief.
 
 4. **USB cable is charge-only** -- Use a data-capable USB-C cable.
+
+### r1_escape unlock/entry fails on newest OTA firmware
+
+**Symptom:** `r1_escape`-based unlock or fastboot entry attempts fail on devices that were fully updated via OTA.
+
+**Possible cause:** Newer RabbitOS OTA builds may change preloader/bootloader behavior in ways that break older `r1_escape` workflows.
+
+**What to try:**
+
+1. Confirm your current stock build/version and record it in your notes
+2. Test with a known working backup/base image from the `r1_escape` community
+3. Re-run `mtkbootcmd.py`/fastboot flow from that known-good base
+
+This is currently anecdotal; if you can reproduce, include versions and logs when reporting issues.
 
 ### Stuck on "orange state" screen
 
@@ -46,16 +63,17 @@ echo "blacklist cdc_acm" > /etc/modprobe.d/blacklist-cdc_acm.conf
 **Explanation:** The orange state warning is normal on devices with an unlocked bootloader and disabled vbmeta verification. The device IS booting -- it's just showing this warning before continuing.
 
 **What to do:**
+
 1. Wait 5-10 seconds for it to continue booting
 2. If the screen goes dark, the device may have booted but gone to sleep:
-   ```bash
-   rmmod cdc_acm
-   adb shell input keyevent KEYCODE_WAKEUP
-   ```
+    ```bash
+    rmmod cdc_acm
+    adb shell input keyevent KEYCODE_WAKEUP
+    ```
 3. Set the display density:
-   ```bash
-   adb shell wm density 190
-   ```
+    ```bash
+    adb shell wm density 190
+    ```
 
 ### fastbootd not entering (after flashing CipherOS boot.img)
 
@@ -72,6 +90,7 @@ echo "blacklist cdc_acm" > /etc/modprobe.d/blacklist-cdc_acm.conf
 **Cause:** The stock R1 partition layout doesn't include `system_ext`. CipherOS needs it.
 
 **Fix:** Create the partition in fastbootd before flashing:
+
 ```bash
 fastboot create-logical-partition system_ext_a 559304704
 ```
@@ -83,6 +102,7 @@ fastboot create-logical-partition system_ext_a 559304704
 **Cause:** The kernel is loading but crashing immediately. This often happens with an incompatible boot.img or corrupted super partition.
 
 **Fix:**
+
 1. Wait for the cycling to slow down or stop
 2. Use `mtkbootcmd.py` to re-enter fastboot
 3. Re-flash from scratch following the full [Flashing Guide](flashing-guide.md)
@@ -94,6 +114,7 @@ fastboot create-logical-partition system_ext_a 559304704
 **Cause:** Fastbootd (userspace) can only see logical partitions inside super, not physical partitions like userdata.
 
 **Fix:** Use `fastboot erase userdata` instead, or switch back to bootloader fastboot for the wipe:
+
 ```bash
 fastboot reboot bootloader
 fastboot erase userdata
@@ -104,6 +125,7 @@ fastboot erase userdata
 **Symptom:** Device appears completely dead -- no USB, no screen, no response to power button.
 
 **Fix:**
+
 1. Use the reset pin near the SIM slot (insert SIM ejector tool)
 2. Wait 30 seconds
 3. Plug in USB-C while running `mtkbootcmd.py` -- the preloader should still respond

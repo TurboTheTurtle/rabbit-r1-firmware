@@ -4,11 +4,11 @@ Guides, scripts, and technical documentation for flashing custom firmware on the
 
 ## What's in This Repo
 
-| Directory | Contents |
-|-----------|----------|
-| [`docs/`](docs/) | Flashing guides, hardware reference, troubleshooting, CipherOS findings |
-| [`scripts/`](scripts/) | Automation scripts for fastboot entry and flashing |
-| [`firmware/`](firmware/) | Download links and SHA-256 checksums for firmware images |
+| Directory                | Contents                                                                |
+| ------------------------ | ----------------------------------------------------------------------- |
+| [`docs/`](docs/)         | Flashing guides, hardware reference, troubleshooting, CipherOS findings |
+| [`scripts/`](scripts/)   | Automation scripts for fastboot entry and flashing                      |
+| [`firmware/`](firmware/) | Download links and SHA-256 checksums for firmware images                |
 
 ## Hardware
 
@@ -31,16 +31,21 @@ Guides, scripts, and technical documentation for flashing custom firmware on the
 ## Key Findings
 
 ### What Works
+
 - CipherOS (Android 16, SDK 36) boots and runs on the R1
 - WiFi, Bluetooth, touchscreen, display, USB, camera
 - Scroll wheel sends `KEY_UP`/`KEY_DOWN` (DPAD navigation)
 - ADB over USB (must toggle `cdc_acm` kernel module)
 - Tailscale VPN connectivity
 
+Recent user reports indicate newer CipherOS builds for `cipher_r1` (for example, `CipherOS-7.0-ALHENA-cipher_r1-20250623-0753-BETA-OFFICIAL-VANILLA`) include side-button behavior fixes. See the flashing guide for current download notes.
+
 ### What Doesn't Work on CipherOS
-- **Side button produces zero interrupts** — the `mtk-kpd` kernel driver in CipherOS's kernel does not generate any events on button press. Stock kernel works fine. This appears to be a missing GPIO/PMIC configuration in the CipherOS device tree. See [CipherOS Findings](docs/cipheros-findings.md) for details.
+
+- **Side button may be broken on older builds** — earlier builds (documented in [CipherOS Findings](docs/cipheros-findings.md)) showed zero interrupts from the side button. Newer builds may improve this behavior.
 
 ### Critical Gotchas
+
 - **No volume buttons** → can't enter fastboot the Android way. Must use `mtkbootcmd.py` to send FASTBOOT command via preloader serial.
 - **CipherOS boot.img doesn't support fastbootd** → must use stock boot.img (v0.8.293) even when running CipherOS.
 - **`cdc_acm` conflicts with `adb`** → must toggle the kernel module: enable for `mtkbootcmd.py`, disable for `adb`.
@@ -50,13 +55,13 @@ Guides, scripts, and technical documentation for flashing custom firmware on the
 
 ## Scripts
 
-| Script | Purpose |
-|--------|---------|
+| Script                                           | Purpose                                                    |
+| ------------------------------------------------ | ---------------------------------------------------------- |
 | [`fastboot-entry.sh`](scripts/fastboot-entry.sh) | Enter fastboot mode via preloader serial (`mtkbootcmd.py`) |
-| [`flash-cipheros.sh`](scripts/flash-cipheros.sh) | Flash CipherOS (multi-phase fastboot + fastbootd) |
-| [`flash-stock.sh`](scripts/flash-stock.sh) | Restore stock RabbitOS firmware |
-| [`toggle-cdc-acm.sh`](scripts/toggle-cdc-acm.sh) | Toggle `cdc_acm` kernel module for serial vs adb |
-| [`post-install.sh`](scripts/post-install.sh) | Post-boot configuration (density, wake, etc.) |
+| [`flash-cipheros.sh`](scripts/flash-cipheros.sh) | Flash CipherOS (multi-phase fastboot + fastbootd)          |
+| [`flash-stock.sh`](scripts/flash-stock.sh)       | Restore stock RabbitOS firmware                            |
+| [`toggle-cdc-acm.sh`](scripts/toggle-cdc-acm.sh) | Toggle `cdc_acm` kernel module for serial vs adb           |
+| [`post-install.sh`](scripts/post-install.sh)     | Post-boot configuration (density, wake, etc.)              |
 
 ## Prerequisites
 
