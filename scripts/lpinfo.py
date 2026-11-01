@@ -67,8 +67,8 @@ def main():
 
         parts = entries(t["partitions"], "<36sIIII", ["name", "attributes", "first_extent", "num_extents", "group_index"])
         exts = entries(t["extents"], "<QIQI", ["num_sectors", "target_type", "target_data", "target_source"])
-        groups = entries(t["groups"], "<36sII", ["name", "flags", "max_size"])
-        bdevs = entries(t["block_devices"], "<QIII", ["first_logical_sector", "alignment", "alignment_offset", "size"])
+        groups = entries(t["groups"], "<36sIQ", ["name", "flags", "max_size"])
+        bdevs = entries(t["block_devices"], "<QIIQ", ["first_logical_sector", "alignment", "alignment_offset", "size"])
 
     for p in parts:
         p["name"] = p["name"].rstrip(b"\x00").decode()

@@ -74,6 +74,8 @@ Guides, scripts, and technical documentation for flashing custom firmware on the
 | [`post-install.sh`](scripts/post-install.sh) | Post-boot configuration (density, wake, etc.) |
 | [`dump-stock.sh`](scripts/dump-stock.sh) | Dump partitions via mtkclient before flashing (boot chain, calibration, super) |
 | [`lpinfo.py`](scripts/lpinfo.py) | Read dynamic-partition (LP) metadata from a `super` image without `lpunpack` |
+| [`lpmake.py`](scripts/lpmake.py) | Build a `super` image with LP metadata and logical partitions, without `lpmake` |
+| [`mksparse.py`](scripts/mksparse.py) | Convert a raw `super` image to a chunk-bounded Android sparse image (MTK LK rejects multi-GB chunks) |
 
 ## Prerequisites
 
