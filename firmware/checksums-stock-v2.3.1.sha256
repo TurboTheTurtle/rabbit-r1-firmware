@@ -7,13 +7,15 @@
 # of what the device was actually running.
 #
 # Caveats:
-#  - The source device was Magisk-rooted. Slot A carries the patch, which is why
-#    boot_a != boot_b and vbmeta_a != vbmeta_b. Slot B is the unmodified reference.
-#  - `super.bin` includes live COW overlays (virtual A/B snapshot state), so it is
-#    the whole system as it booted, not just the base partitions.
-#  - These are per-device for the calibration partitions (nvram, nvdata, ...) and
-#    build-specific for everything else. A different device on the same build will
-#    match the boot-chain hashes but not nvram/nvdata.
+#  - Slot A and slot B hold different builds. This device took an OTA that landed in
+#    slot B: boot_b's kernel is #6, built 2026-09-10 on host c0941d9aa82e (which matches
+#    ro.build.host of the running 2.3.1 system), while boot_a's kernel is #3 from
+#    2026-04-16. Neither ramdisk contains Magisk, so the boot chain is unpatched.
+#  - `super.bin` includes live COW overlays (virtual A/B snapshot state), so it is the
+#    whole system as it booted. Extracting `system_a` alone yields the older April build.
+#  - Boot-chain hashes are build-specific: a device on the same build will match them.
+#  - This file covers a raw dump sitting on disk. The published release ships
+#    `super.bin.zst` instead; see checksums-release-v2.3.1.sha256 for those asset hashes.
 #
 # Verify (files must be in the current directory):
 #   sha256sum -c checksums-stock-v2.3.1.sha256

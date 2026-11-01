@@ -19,14 +19,17 @@ Firmware images are not included in this repository due to their size. Download 
 
 ## Stock Firmware (Rabbit OS v2.3.1 and newer)
 
-**Download:** none — there is no published release for these builds.
+**Download:** [stock-v2.3.1 release](https://github.com/TurboTheTurtle/rabbit-r1-firmware/releases/tag/stock-v2.3.1)
+— a community dump, since Rabbit publishes nothing for this build.
 
 The newest archive on [rabbit-hmi-oss/firmware](https://github.com/rabbit-hmi-oss/firmware/releases)
 is v0.8.293 from May 2025. Devices in the field run much newer software: the test unit for
 this project reported `rabbit_OS_v2.3.1_20260910192308`, Android 13 (SDK 33), built
 2026-09-10. Flashing v0.8.293 onto such a device is a **downgrade**.
 
-The only way to keep that build is to dump it from the device itself — see
+The release above carries the boot chain plus a zstd-compressed `super` (1.89 GiB) and
+excludes every per-device partition, so it contains no personal data. For a complete
+backup — calibration, DRM keys, slot state — dump your own device:
 [Backing Up a Rabbit R1](../docs/device-dump.md).
 
 **Files produced by a dump:**
@@ -61,7 +64,8 @@ The only way to keep that build is to dump it from the device itself — see
 | File | Covers |
 |------|--------|
 | `checksums.sha256` | Stock v0.8.293 release images and CipherOS images |
-| `checksums-stock-v2.3.1.sha256` | Boot-chain and `super` images from the v2.3.1 device dump |
+| `checksums-stock-v2.3.1.sha256` | Boot-chain and `super` images from a raw v2.3.1 device dump |
+| `checksums-release-v2.3.1.sha256` | Exactly the assets in the [stock-v2.3.1 release](https://github.com/TurboTheTurtle/rabbit-r1-firmware/releases/tag/stock-v2.3.1) |
 
 To verify a downloaded release:
 ```bash

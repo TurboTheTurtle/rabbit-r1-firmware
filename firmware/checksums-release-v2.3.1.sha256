@@ -1,0 +1,38 @@
+# Stock RabbitOS v2.3.1 — published release assets
+# https://github.com/TurboTheTurtle/rabbit-r1-firmware/releases/tag/stock-v2.3.1
+#
+# These are exactly the assets in that release. Every per-device partition is
+# excluded (userdata, nvram, nvdata, nvcfg, proinfo, seccfg, protect1/2, para,
+# boot_para, frp, metadata, md_udc, otp), so the release contains no personal data.
+#
+# `super.bin.zst` decompresses (zstd -d) to the 8,792,064,000-byte image whose
+# SHA-256 is 1a0027dd5ecf2460201b497abeda8b6dba2f66cb954813317782ad22b23d45a8.
+#
+# Verify after downloading the assets into one directory:
+#   sha256sum -c checksums-release-v2.3.1.sha256
+9975ebafa964521e0b62f006b175f26a4e949a027a527264b694915346a1c8dc  boot_a.bin
+61292f60bd1694aa16d7faa8521376e92896dad86147053a83e603fb845f9926  boot_b.bin
+2daeb1f36095b44b318410b3f4e8b5d989dcc7bb023d1426c492dab0a3053e74  init_boot_a.bin
+2daeb1f36095b44b318410b3f4e8b5d989dcc7bb023d1426c492dab0a3053e74  init_boot_b.bin
+3b6a07d0d404fab4e23b6d34bc6696a6a312dd92821332385e5af7c01c421351  vendor_boot_a.bin
+3b6a07d0d404fab4e23b6d34bc6696a6a312dd92821332385e5af7c01c421351  vendor_boot_b.bin
+8fc1d676d02991ab4ddc64e22a2b3133550ead4c8cb36be2b609ff79db33aa90  dtbo_a.bin
+a66978478d4129d1df4e0607af31238cc3b0802ef8c08adb26ed2b20382f7c2e  lk_a.bin
+ddf76dbb61743ef2d36940830ae4448a7a7b07bda25ef0244f91bc21d8d2b762  lk_b.bin
+81ff9f4928d9050d872fb78c11680cc749f0e30960c8fc00eec386898c52d3f3  tee_a.bin
+7fadcbd65fce01ec36242260543470aa52019deb36c29e92cd698a0c14ddd8d1  md1img_a.bin
+7c6f1991d9e643a630bb0030dcf3998a5154fd355f5e1967219a20f04f0cd73d  gz_a.bin
+05a1fd2cd1c75e7bee36e6e8521fd213e3e9cb982bbbee03ea7cf3bc51480b38  gz_b.bin
+89b143cfcd7cdb0725c4a25066d9494d491365689cef5225fc411f740dc1c5b0  scp_a.bin
+3e9e4c68b05acc2626d3c93601a8a8971b47ecee6e81d75704fe6e600cdbe32b  scp_b.bin
+d12615c06d90605b34af85617a853d51110a4fa22a6a158a3be25496b0b1be15  sspm_a.bin
+302b1330a01296a5598ca4efd76ec21f8552e60c5f6e1d7bf7cb7154315ca45e  sspm_b.bin
+875993c92f7b78f45df91598bcfcb1b83a3ccaf6d58df3cb1b17a4442a9ac8ec  spmfw_a.bin
+f6e5bbeea941cbc622e5575eccc7d3009742e1489f0050eff2c7ca4da21d3202  spmfw_b.bin
+72aaa967e434534307f66731b2729cd7b7acca6de62cb3d2b0e3fc5d2cfc28cf  vbmeta_a.bin
+e341742915ff035d782c25c936a6f2a03c1d26c03ecea02dbfbcbe23b9e6a4d0  vbmeta_b.bin
+98b1ee0f09ca219519aea5ce5522638a577264f366ffa59faddf4dc0e1baff6d  vbmeta_system_a.bin
+53dfb0b93acdf835e97de36f941063ea1351d9f4b8713dfdc92f1f04ffc92113  vbmeta_system_b.bin
+80faf95d58afbdddb85548c4e56149ff3def6c9e0485128eb7768cbcf5cb12ac  vbmeta_vendor_a.bin
+d7658426324dc98b988ced4b84c7c8c96c30fa2019fa637a1028f56c1d0108da  vbmeta_vendor_b.bin
+dbaee79a46b5e5351115202281596ebb2b7af9c792c4967cfe1c4a4b4fe1b8f3  super.bin.zst

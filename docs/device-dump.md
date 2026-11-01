@@ -10,7 +10,9 @@ is running.
    shipped with `rabbit_OS_v2.3.1_20260910192308` (Android 13, SDK 33, built
    2026-09-10) — roughly 16 months newer than the newest published release. Flashing
    v0.8.293 is a *downgrade*, and there is nothing to download that matches what was
-   on the device.
+   on the device. (A reference copy of that build is published in the
+   [stock-v2.3.1 release](https://github.com/TurboTheTurtle/rabbit-r1-firmware/releases/tag/stock-v2.3.1),
+   but it omits the per-device partitions described in point 3.)
 
 2. **OTA updates use virtual A/B snapshots.** The `super` partition on an updated
    device carries `system_a-cow`, `vendor_a-cow` and `product_a-cow` extents alongside

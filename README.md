@@ -34,8 +34,9 @@ Guides, scripts, and technical documentation for flashing custom firmware on the
 ### Firmware Versions
 - **Published releases stop at v0.8.293.** Production units run much newer software — the
   unit used for this project reported `rabbit_OS_v2.3.1_20260910192308`, Android 13 (SDK 33),
-  built 2026-09-10. There is no download for that build, so restoring "stock" from the ZIP
-  downgrades the device.
+  built 2026-09-10. Rabbit publishes nothing for that build, so restoring "stock" from the
+  ZIP downgrades the device. A community dump is available in the
+  [stock-v2.3.1 release](https://github.com/TurboTheTurtle/rabbit-r1-firmware/releases/tag/stock-v2.3.1).
 - **OTA updates use virtual A/B COW overlays.** On an updated device, `super` contains
   `system_a-cow`, `vendor_a-cow` and `product_a-cow` extents next to the base partitions.
   Extracting `system_a` alone gives the **pre-OTA** system, not what boots.
