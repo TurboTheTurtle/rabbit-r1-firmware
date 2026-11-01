@@ -36,6 +36,10 @@ Download `rabbit_OS_v0.8.293.zip` from [rabbit-hmi-oss/firmware](https://github.
 - `super.img` -- Stock super partition (clean partition base)
 - `vbmeta.img`, `vbmeta_system.img`, `vbmeta_vendor.img`
 
+> If your device is on a newer build than v0.8.293 — most are — take a raw dump before
+> flashing, so you can get back to what you actually had. See
+> [Backing Up a Rabbit R1](device-dump.md).
+
 **CipherOS (required):**
 Download CipherOS for the Rabbit R1 (`cipher_r1`). You need:
 - `system.img`, `system_ext.img`, `product.img`, `vendor.img`
@@ -251,6 +255,31 @@ The R1 can always be restored to stock RabbitOS:
 7. Reboot: `fastboot reboot`
 
 Stock firmware v0.8.293 is available at [rabbit-hmi-oss/firmware](https://github.com/rabbit-hmi-oss/firmware/releases).
+
+> **This is a downgrade on most devices.** v0.8.293 (May 2025) is the newest *published*
+> release, but production units ship much newer builds — the test unit for this project
+> was on `rabbit_OS_v2.3.1_20260910192308` (Android 13, built 2026-09-10). There is no
+> download for that build, so restoring from the ZIP throws it away. Dump the device
+> first if you want to keep it: see [Backing Up a Rabbit R1](device-dump.md).
+
+### Restoring from a dump instead
+
+A raw dump restores the exact build, including the COW snapshot state:
+
+```bash
+for f in firmware/device-dump/*.bin; do
+  n=$(basename "$f" .bin)
+  case "$n" in gpt|gpt_backup) continue;; esac
+  mtk w "$n" "$f"
+done
+```
+
+or in a single mtkclient session: `mtk wl firmware/device-dump`.
+
+Raw writes are safe here because the bytes are the original ones — the "mtkclient
+corrupts super" failure documented in [Failed Approaches](failed-approaches.md) comes
+from writing a *different* image with a hand-built LP header, not from writing a dump
+back.
 
 ## Final Configuration
 

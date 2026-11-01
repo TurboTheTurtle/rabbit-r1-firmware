@@ -74,11 +74,17 @@ Key partitions and their byte offsets on the eMMC:
 | `para` | 0x108000 | 512KB | A/B slot info at offset 0x800 (slot_a active). Also serves as misc/BCB partition |
 | `lk_a` | 0x18f00000 | 1MB | LK bootloader slot A |
 | `boot_a` | 0x19000000 | 32MB | Kernel + ramdisk slot A |
-| `vendor_boot_a` | 0x1B000000 | 32MB | Vendor boot slot A |
+| `vendor_boot_a` | 0x1B000000 | 64MB | Vendor boot slot A |
+| `init_boot_a` | 0x1F000000 | 8MB | Android 13+ generic ramdisk (Magisk patches this on devices with `init_boot`) |
+| `dtbo_a` | 0x1F800000 | 8MB | Device tree overlay slot A |
 | `lk_b` | 0x29700000 | 1MB | LK bootloader slot B |
 | `boot_b` | 0x29800000 | 32MB | Kernel + ramdisk slot B |
 | `super` | 0x31000000 | ~8.19 GiB | Dynamic partitions container |
 | `userdata` | 0x23F000000 | Remaining | User data |
+
+Sizes and offsets here were verified against a GPT dump of a production unit
+(`rabbit_OS_v2.3.1`). Note `vendor_boot_a` is **64 MB**, not the 32 MB quoted in older
+write-ups, and `init_boot_a` exists on this device (Android 13 boot layout).
 
 ### Super Partition (Dynamic Partitions)
 
@@ -88,6 +94,16 @@ The `super` partition contains logical partitions managed by Android's dynamic p
 - `system_a` -- Main Android system
 - `vendor_a` -- Vendor HAL and firmware
 - `product_a` -- Product-specific apps and overlays
+
+**Stock layout after an OTA** (observed on `rabbit_OS_v2.3.1`, virtual A/B):
+- `system_a`, `vendor_a`, `product_a` -- base partitions, now *pre-OTA*
+- `system_a-cow` (759 MB), `vendor_a-cow` (167 MB), `product_a-cow` (104 MB) -- copy-on-write
+  overlays holding the OTA delta
+
+The running system is the base partition merged with its COW overlay. Extracting
+`system_a` alone therefore yields the **pre-OTA** system, which matters when choosing a
+base image for a reflash or a bake. Dumping the whole `super` preserves the merged state;
+see [Backing Up a Rabbit R1](device-dump.md).
 
 **CipherOS layout** (after flashing):
 - `system_a` -- CipherOS system (~1.4GB)
@@ -114,6 +130,24 @@ The super partition header uses Android's LpMetadata format:
 | Header size | 256 |
 | Flags | 0x1 (Virtual A/B) |
 | Partition attributes | 0x00000005 (READONLY + SLOT_SUFFIXED) |
+
+## Firmware Versions Observed
+
+| Build | Android | Build date | Availability |
+|-------|---------|------------|--------------|
+| `rabbit_OS_v0.8.293` | 13 (SDK 33) | 2025-05-16 | Published release |
+| `rabbit_OS_v2.3.1_20260910192308` | 13 (SDK 33) | 2026-09-10 | Production unit only — no download |
+
+Production devices ship far newer software than the newest published release
+(v0.8.293, May 2025). Restoring "stock" from the release archive on such a device is a
+downgrade; dump the device first if you want to keep its build
+([device-dump.md](device-dump.md)).
+
+The build string is readable straight out of a `super` dump:
+
+```bash
+grep -a -m1 -o "ro.build.display.id=[[:print:]]\{1,64\}" super.bin
+```
 
 ## LK Bootloader Analysis
 
